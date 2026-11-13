@@ -47,8 +47,6 @@ bool initMotor() {
   // I fried SPI0 on the first Teensy.
   motorSensor01.init(&SPI1);
   motor.linkSensor(&motorSensor01);
-  
-
 
   // Calibration parameters, To find parameters: "find_sensor_offset_and_direction.ino"
   //motor.sensor_direction = Direction::CCW;
@@ -137,8 +135,6 @@ bool initMotor() {
 
 }
 
-
-<<<<<<< HEAD
 // Execute motor FOC based on current command received
 void updateMotor() {
 
@@ -152,9 +148,6 @@ void updateMotor() {
 
 }
 
-
-=======
->>>>>>> 844840d8f64ff8e82e0bea67050e14404b34a4a0
 // Set commanded q-axis current [A]
 void setMotorCurrent(float current_q_cmd) {
 
@@ -162,17 +155,6 @@ void setMotorCurrent(float current_q_cmd) {
 
 }
 
-
-// Execute motor FOC based on current command received
-void updateMotor() {
-
- // Serial.println(motorSensor01.getAngle(), 6);
-  // main FOC algorithm function
-  motor.loopFOC();
-  // Motion control function
-  motor.move(motorCommands.current_q_cmd);
-
-}
 
 
 // Update measured motor telemetry

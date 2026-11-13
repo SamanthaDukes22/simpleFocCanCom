@@ -38,7 +38,6 @@ void loop() {
   //float foc_frequency = 1000000.0f / motor.loopfoc_time_us;
   //float motion_frequency = 1000000.0f / motor.move_time_us;
 
-<<<<<<< HEAD
  // static uint32_t lastTelemetryTime = 0;
 
   // Sample motor data @ 100Hz and send to ESP32 
@@ -60,9 +59,5 @@ void loop() {
 <<<<<<< HEAD
   }
 */
-=======
-  
-
->>>>>>> 844840d8f64ff8e82e0bea67050e14404b34a4a0
 }
  
