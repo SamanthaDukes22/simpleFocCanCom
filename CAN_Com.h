@@ -11,7 +11,7 @@ void setupCAN();
 void receiveCANCommand();
 
 // Handle motor command 
-void handleCANCommand(CANMessage &message);
+bool handleCANCommand(CANMessage &message);
 
 // Transmit d-axis and q-axis current measurements
 void transmitCurrentTelemetry();
