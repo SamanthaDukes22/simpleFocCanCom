@@ -6,6 +6,77 @@
 #include "Data.h"
 #include "Motor_Control.h"
 
+void setupCAN() {
+
+  ACAN_T4_Settings settings(CAN_BAUD_RATE);
+
+  settings.mRxPin = 23;
+  settings.mTxPin = 22;
+
+  settings.mLoopBackMode = false;
+  settings.mSelfReceptionMode = false;
+
+  const ACANPrimaryFilter primaryFilters[] = {
+    ACANPrimaryFilter(kData, kStandard, CAN_ID_MOTOR_COMMAND)
+  };
+
+  const uint32_t errorCode = ACAN_T4::can1.begin(settings, primaryFilters, 1);
+
+  if (errorCode == 0) {
+    Serial.println("Ready for CAN communication");
+  } else {
+    Serial.print("CAN initialization error: ");
+    Serial.println(errorCode, HEX);
+  }
+}
+
+
+void receiveCANCommand() {
+
+  CANMessage message;
+
+  if (ACAN_T4::can1.receive(message)) {
+
+    if (!message.rtr &&
+        !message.ext &&
+        message.id == CAN_ID_MOTOR_COMMAND &&
+        message.len == sizeof(float)) {
+
+      float current_q_cmd;
+
+      // Extract commanded current
+      memcpy(&current_q_cmd, message.data, sizeof(float));
+
+      // Validate commanded current
+      if (!isfinite(current_q_cmd)) {
+        Serial.println("ERROR: Invalid current command!");
+        return;
+      }
+
+      if (fabs(current_q_cmd) > MAX_CURRENT) {
+        Serial.println("ERROR: Current command exceeds limit!");
+        return;
+      }
+
+      // Update motor current command
+      setMotorCurrent(current_q_cmd);
+
+      Serial.print("Received current command: ");
+      Serial.print(current_q_cmd, 4);
+      Serial.println(" A");
+    }
+  }
+}
+
+/*
+#include <ACAN_T4.h>
+#include <math.h>
+#include <string.h>
+
+#include "CAN_Com.h"
+#include "Data.h"
+#include "Motor_Control.h"
+
 // Implementation of functions for CAN communication between Teensy and ESP32
 // ACAN_T4 docuementation: https://github.com/pierremolinaro/acan-t4
 
@@ -50,7 +121,29 @@ void setupCAN() {
 }
 
 
+
+void receiveCANCommand() {
+
+  CANMessage message;
+
+  if (ACAN_T4::can1.receive(message)) {
+
+    // Verify standard data frame and correct motor command ID
+    if (!message.rtr && !message.ext &&
+        message.id == CAN_ID_MOTOR_COMMAND &&
+        message.len == sizeof(float)) {
+
+        if (handleCANCommand(message)) {
+          Serial.print("Motor ");
+          Serial.print(MOTOR_NUMBER);
+          Serial.println(" accepted the current command!");
+        }
+    }
+  }
+}
+/*
 // Receive motor current command from ESP32
+// Receive motor current command from teensy
 void receiveCANCommand() {
 
   CANMessage message;
@@ -59,7 +152,7 @@ void receiveCANCommand() {
 
     // Verify standard data frame and correct motor command ID
     if (!message.rtr && !message.ext && 
-        message.id == static_cast<uint32_t>(CAN_ID_MOTOR_COMMAND) && 
+        message.id == static_cast<uint32_t>(CAN_ID_MOTOR1_COMMAND) && 
         message.len == static_cast<uint32_t>(sizeof(float))) {
         handleCANCommand(message);
         Serial.print("Motor ");
@@ -71,8 +164,36 @@ void receiveCANCommand() {
 }
 
 
+bool handleCANCommand(CANMessage &message) {
+
+  float current_q_cmd;
+
+  // Extract commanded current from CAN message
+  memcpy(&current_q_cmd, message.data, sizeof(float));
+
+  // Validate commanded current
+  if (!isfinite(current_q_cmd)) {
+      Serial.println("ERROR: Invalid current command!");
+      return false;
+  }
+
+  if (fabs(current_q_cmd) > MAX_CURRENT) {
+      Serial.println("ERROR: Current command exceeds limit!");
+      return false;
+  }
+
+  // Update motor current command
+  setMotorCurrent(current_q_cmd);
+
+  Serial.print("Received q-axis current command: ");
+  Serial.print(current_q_cmd, 4);
+  Serial.println(" A");
+
+  return true;
+}
+
 // Handle motor command and store in motor command structure
-void handleCANCommand(CANMessage &message) {
+bool handleCANCommand(CANMessage &message) {
 
   float current_q_cmd;
 
@@ -116,7 +237,7 @@ void transmitCurrentTelemetry() {
   // transfer succeeds if the buffer is not full. The tryToSend method returns false if the buffer is full, and true
   // otherwise. Note the returned value only tells if the transfer into the Driver transmit buffer is successful or not:
   // we have no way to know if the frame is actually sent on the the CAN network.
-  */
+
 
   // Create CAN message
   CANMessage message;
@@ -180,6 +301,9 @@ void transmitDynamicTelemetry() {
   Serial.println(" dynamic CAN frame accepted into Driver transmit buffer");
 
 }
+*/
+
+
 
 
 

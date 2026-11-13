@@ -9,7 +9,7 @@
 bool initMotor();
 
 // Set commanded q-axis current [A]
-void setMotorCurrent(float current_q);
+void setMotorCurrent(float current_q_cmd);
 
 // Execute motor FOC with current command from ESP32
 void updateMotor();

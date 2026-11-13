@@ -16,7 +16,7 @@
 InlineCurrentSense current_sense  = InlineCurrentSense( 132.0f,  A0, A1, A2 );
 
 // MagneticSensorSPI(int cs, float_cpr, int_angle_register, long_clock_speed)
-// cs             - SPI chip select pin. Test : 10
+// cs             - SPI chip select pin. Test : 0
 // bit_resolution - magnetic sensor resolution - AS508A : 14
 // angle_register - (optional) angle read register - default 0x3FFF
 // clock_speed    - (optional) SPI clock speed - default 1MHz -
@@ -40,17 +40,21 @@ bool initMotor() {
   pinMode(23, OUTPUT);
 
   SimpleFOCDebug::enable(&Serial);
-
+  pinMode(23, OUTPUT);
+ // SimpleFOCDebug::enable(&Serial);
   // Sensor Initialization Encoder uses SPI_MODE1
   motorSensor01.spi_mode = SPI_MODE1;
+  // I fried SPI0 on the first Teensy.
   motorSensor01.init(&SPI1);
-
-
   motor.linkSensor(&motorSensor01);
+  
+
 
   // Calibration parameters, To find parameters: "find_sensor_offset_and_direction.ino"
-  motor.sensor_direction = Direction::CCW;
-  motor.zero_electric_angle = 1.58;
+ // motor.sensor_direction = Direction::CCW;
+ // motor.zero_electric_angle = 1.58;
+  
+  
  
   // Limit voltage and current
   motor.current_limit = MAX_CURRENT; // set current limit to 1 A
@@ -66,7 +70,7 @@ bool initMotor() {
   driver.dead_zone = 0.02;
 
   // power supply voltage [V]: Max DC voltage allowed - default 0.5 power supply.
-  driver.voltage_power_supply = 11.06;
+  driver.voltage_power_supply = 11.00;
 
   // init driver
   Serial.print("Driver init ");
@@ -136,24 +140,22 @@ bool initMotor() {
 }
 
 
-// Execute motor FOC based on current command received
-void updateMotor() {
-
-  // main FOC algorithm function
-  motor.loopFOC();
-  // Motion control function
-  motor.move(motorCommands.current_q_cmd);
-
-  // user communication
- // command.run();
-
-}
-
-
 // Set commanded q-axis current [A]
 void setMotorCurrent(float current_q_cmd) {
 
   motorCommands.current_q_cmd = current_q_cmd;
+
+}
+
+
+// Execute motor FOC based on current command received
+void updateMotor() {
+
+ // Serial.println(motorSensor01.getAngle(), 6);
+  // main FOC algorithm function
+  motor.loopFOC();
+  // Motion control function
+  motor.move(motorCommands.current_q_cmd);
 
 }
 
