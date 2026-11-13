@@ -49,8 +49,8 @@ bool initMotor() {
   motor.linkSensor(&motorSensor01);
 
   // Calibration parameters, To find parameters: "find_sensor_offset_and_direction.ino"
-  motor.sensor_direction = Direction::CCW;
-  motor.zero_electric_angle = 1.58;
+  //motor.sensor_direction = Direction::CCW;
+  //motor.zero_electric_angle = 1.58;
  
   // Limit voltage and current
   motor.current_limit = MAX_CURRENT; // set current limit to 1 A
@@ -143,7 +143,7 @@ void updateMotor() {
   motor.loopFOC();
   // Motion control function
   motor.move(motorCommands.current_q_cmd);
-
+  //Serial.println(motorSensor01.getSensorAngle());
   // user communication
  // command.run();
 

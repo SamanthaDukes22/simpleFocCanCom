@@ -14,7 +14,7 @@ void setup() {
 
   if (!initMotor()) {
       Serial.println("Motor initialization failed!");
-      while (true) {}
+      //while (true) {}
   }
 
   setupCAN();
@@ -35,10 +35,10 @@ void loop() {
   //float foc_frequency = 1000000.0f / motor.loopfoc_time_us;
   //float motion_frequency = 1000000.0f / motor.move_time_us;
 
-  static uint32_t lastTelemetryTime = 0;
+ // static uint32_t lastTelemetryTime = 0;
 
   // Sample motor data @ 100Hz and send to ESP32 
-  if (micros() - lastTelemetryTime >= 10000) { // 100 Hz
+ /* if (micros() - lastTelemetryTime >= 10000) { // 100 Hz
 
     lastTelemetryTime = micros();
 
@@ -48,6 +48,6 @@ void loop() {
     transmitDynamicTelemetry();
 
   }
-
+*/
 }
  
